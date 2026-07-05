@@ -25,18 +25,26 @@ A **durable** handoff: it writes the handoff doc, registers it, and links it to 
 5. **Tell the user** the temp path, the register entry, and the Linear link — **and print the kickoff prompt as a fenced code block in the chat** so the operator can paste it into a fresh agent. Never auto-send it into the current session (that starts the task here instead of in a fresh agent).
 
 ## Kickoff prompt
-A **self-contained pointer block** a zero-context agent pastes to claim and start: it points at the doc/register/issue by id/path and never reproduces them. Required parts, in order: **role/mission · pull-the-task · read-context · first-skill · first-action · guardrails · close-the-loop** — shaped like:
+A **self-contained pointer block** a zero-context agent pastes to claim and start: it points at the doc/register/issue by id/path and never reproduces them. Required parts, in order: **role/mission · pull-the-task · read-context · first-skill · do · gotchas · done-when · close-the-loop** — shaped like:
 ```text
 You are <role>. Pull and start Linear issue <ID> ("<title>").
 
-1. PULL THE TASK: assign <ID> to yourself and set it "In Progress" so it isn't double-grabbed.
-2. READ CONTEXT: the brief at <doc path> and the entry in <register path>; the issue is <ID>.
+1. PULL THE TASK: assign <ID> to yourself and set it "In Progress". If it is already
+   assigned to someone else or In Progress, STOP and ask the operator — don't steal it.
+2. READ CONTEXT: the brief at <doc path> and the entry in <register path>. The temp doc
+   may be gone by now — if so, resume from the <ID> description and comments (they carry
+   the summary and this prompt) and say the doc was missing.
 3. INVOKE `<skill>` FIRST (it governs this work).
-4. DO: <first concrete action(s)>.
-5. GOTCHAS: <one-line pointer to the doc's gotchas/blockers>.
-6. CLOSE THE LOOP: when done, comment on <ID> with what changed + evidence and set it Done;
+4. DO: <concrete action(s); mark which are ordered vs independent>. When a step needs a
+   human (approval, deploy, credentials), file a needs:operator issue and move on to
+   independent items — don't idle at the gate.
+5. GOTCHAS: <one-line pointer to the doc's gotchas/blockers; include workspace/branch
+   constraints if any>.
+6. DONE WHEN: <one-sentence goal state — what must be true for this handoff to be finished>.
+7. CLOSE THE LOOP: when done, comment on <ID> with what changed + evidence and set it Done;
    if blocked, comment the blocker and leave it In Progress.
 ```
+Keep DO at pointer altitude — sub-steps that need more than a line belong in the doc/issue, referenced by id.
 
 ## Rules
 - **Redact secrets** — never put API keys, tokens, passwords, or PII in the doc, register, Linear, or kickoff prompt.
