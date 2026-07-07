@@ -19,3 +19,4 @@ git clone https://github.com/0xneelo/linear-handoff.git ~/.claude/skills/linear-
 - **Initial** — durable handoff: temp doc + register + Linear link.
 - **SYN-233** — added the copy-pasteable, three-channel kickoff prompt (~500 → ~1110 words).
 - **SYN-234** — trimmed back toward concise (~1110 → ~772 words) with no loss of load-bearing behavior, re-verified via subagent harness.
+- **Cost-aware** — injected the cost stack: the kickoff now propagates model-tiering to the agent it boots (Haiku `reader` for reads, Sonnet `builder` for edits, Opus for decisions), added a run-cheap `## Cost` directive (delegate only genuine state reconstruction to a `reader`; keep Linear writes / register append / secret redaction exact), and generalized the Linear abort path (blocked → blocked-or-fails). Verified new-vs-snapshot: cost-aware kickoff emitted only by the new version, zero secret leaks, no regression.

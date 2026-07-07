@@ -34,7 +34,9 @@ You are <role>. Pull and start Linear issue <ID> ("<title>").
 2. READ CONTEXT: the brief at <doc path> and the entry in <register path>. The temp doc
    may be gone by now — if so, resume from the <ID> description and comments (they carry
    the summary and this prompt) and say the doc was missing.
-3. INVOKE `<skill>` FIRST (it governs this work).
+3. INVOKE `<skill>` FIRST (it governs this work). Then work cost-disciplined: delegate
+   reads/search to a Haiku `reader`, scoped edits to a Sonnet `builder`, and keep this
+   driver (Opus) for decisions — run `/cost-aware` first if it is available.
 4. DO: <concrete action(s); mark which are ordered vs independent>. When a step needs a
    human (approval, deploy, credentials), file a needs:operator issue and move on to
    independent items — don't idle at the gate.
@@ -48,7 +50,11 @@ Keep DO at pointer altitude — sub-steps that need more than a line belong in t
 
 ## Rules
 - **Redact secrets** — never put API keys, tokens, passwords, or PII in the doc, register, Linear, or kickoff prompt.
-- The Linear comment and the kickoff prompt both **point** back to the doc — neither reproduces it. If Linear filing is blocked (e.g., an approval gate), record that in the `Linear:` field and still write the doc + register entry + kickoff prompt.
+- The Linear comment and the kickoff prompt both **point** back to the doc — neither reproduces it. If Linear filing is blocked **or fails** (an approval gate, an MCP/API error, or no Linear access at all), record that in the `Linear:` field — what happened and what still needs filing — and still write the doc + register entry + kickoff prompt. A Linear outage must never cost you the durable handoff: this is an abort path, not a stop — keep doing the independent write work.
+
+## Cost
+- **Run this cheap.** You already hold the session context — write the doc, summary, and register entry from it; don't re-read the repo. Only if you must *reconstruct* state (scan logs, list many candidate issues, re-read files) delegate that gather to a Haiku `reader` and keep just the conclusion. Keep the Linear writes, register append, secret redaction, and every issue id / assignment **on the driver, exact** — a mutation or a secret is never delegated-away or compressed (safety carve-out).
+- **The kickoff propagates this** (its step 3 tells the booted agent to tier down too), so the fresh session it seeds — where most of the handoff's real cost lands — runs disciplined, not just this write.
 
 ## Verification
 A correct run leaves **three linked artifacts** — the temp doc, a register entry whose `Linear:` field is filled, and a Linear comment/issue that points back — **plus a kickoff prompt embedded in both the Linear issue description and the temp doc, and surfaced in the chat**. Litmus: a fresh, zero-context agent can resume from the Linear issue alone, and the operator can paste the chat block to boot a new agent.
